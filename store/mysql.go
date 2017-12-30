@@ -108,16 +108,3 @@ func (db *Mysql) DeleteGoods(goodsID int64, ctx context.Context) error {
 	return nil
 }
 
-func (db *Mysql) Status(id int64) (int64, error) {
-	stmt, err := db.db.Prepare("SELECT status FROM rule WHERE id=?")
-	if err != nil {
-		return 0, err
-	}
-	row := stmt.QueryRow(id)
-	var status int64
-	err = row.Scan(&status)
-	if err != nil {
-		return 0, err
-	}
-	return status, nil
-}
