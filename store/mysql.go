@@ -2,109 +2,52 @@ package store
 
 import (
 	"context"
-	"database/sql"
-	"github.com/Giantmen/bitsoon/log"
+	"fmt"
 
 	"github.com/Giantmen/bitsoon/config"
 	"github.com/Giantmen/bitsoon/proto"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/astaxie/beego/orm"
+
 )
 
 type Mysql struct {
-	db  *sql.DB
-	Cfg *config.Mysql
+	dbObj  orm.Ormer
 }
 
 func NewMysql(cfg *config.Mysql) (*Mysql, error) {
-	db, err := sql.Open("mysql", cfg.ConnStr)
-	if err != nil {
-		return nil, err
-	}
-	db.SetMaxOpenConns(cfg.MaxOpen)
-	db.SetMaxIdleConns(cfg.MaxIdle)
-	db.Ping()
+	conn := cfg.ConnStr
+
+	orm.RegisterModel(new(proto.Goods))//goods 如果没有会自动创建
+	orm.RegisterDriver("mysql", orm.DRMySQL) //注册mysql驱动
+	orm.RegisterDataBase("default", "mysql", conn) //设置conn中的数据库为默认使用数据库
+	orm.RunSyncdb("default", false, false)//后一个使用true会带上很多打印信息，数据库操作和建表操作的
+	orm.Debug = true //true 打印数据库操作日志信息
+	dbObj := orm.NewOrm()  //实例化数据库操作对象
 	return &Mysql{
-		db:  db,
-		Cfg: cfg,
-	}, nil
+		dbObj:dbObj,
+	},nil
 }
 
-func (db *Mysql) QueryAllGoods(ctx context.Context) (*proto.GoodsQueryAllResult, error) {
-	rows, err := db.db.Query("SELECT * FROM goods")
+func (orm *Mysql) Query(sql string,result interface{},ctx context.Context) (int64, error) {
+	num, err := orm.dbObj.Raw(sql).QueryRows(result)
 	if err != nil {
-		return nil, err
+		fmt.Println("查询出错")
+		return 0,err
+	} else {
+		fmt.Printf("共查询到记录:%d条\n", num)
+		return num,nil
 	}
-	rrs := new(proto.GoodsQueryAllResult)
-	rrs.Gs = make([]*proto.Goods, 0)
-	for rows.Next() {
-		rr := new(proto.Goods)
-		err = rows.Scan(&rr.ID, &rr.Location, &rr.Price, &rr.RestVolume, &rr.TotalVolume, &rr.Picture, &rr.UID)
-		if err != nil {
-			return nil, err
-		}
-		rrs.Gs = append(rrs.Gs, rr)
-	}
-	return rrs, nil
 }
 
-func (db *Mysql) QueryOneGoods(GoodsID int64, ctx context.Context) (*proto.GoodsQueryOneResult, error) {
-	stmt, err := db.db.Prepare("SELECT * FROM goods WHERE id=?")
+func (orm *Mysql) Exec(sql string, ctx context.Context) (int64,error) {
+	res, err := orm.dbObj.Raw(sql).Exec()
 	if err != nil {
-		return nil, err
+		fmt.Println("执行出错")
+		return 0,err
 	}
-	row := stmt.QueryRow(GoodsID)
-	rr := new(proto.GoodsQueryOneResult)
-	err = row.Scan(&rr.ID, &rr.Location, &rr.Price, &rr.RestVolume, &rr.TotalVolume, &rr.Picture, &rr.UID)
-	if err != nil {
-		return nil, err
-	}
-	log.Debugf("record %d : %+v", GoodsID, *rr)
-	return rr, nil
-}
-
-func (db *Mysql) InsertGoods(gir *proto.GoodsInsert, ctx context.Context) (int64, error) {
-	stmt, err := db.db.Prepare("INSERT goods SET location=?,price=?,restvolume=?,totalvolume=?,picture=?,uid=?")
-	if err != nil {
-		return 0, err
-	}
-
-	//createTime := time.Now().Format("2006-01-02 15:04:05")
-	//updateTime := createTime
-	res, err := stmt.Exec(gir.Location, gir.Price, gir.RestVolume, gir.TotalVolume, gir.Picture, gir.UID)
-	if err != nil {
-		return 0, err
-	}
-
-	id, _ := res.LastInsertId()
-	return id, nil
-}
-
-func (db *Mysql) UpdateGoods(gu *proto.GoodsUpdate, ctx context.Context) error {
-	stmt, err := db.db.Prepare("UPDATE goods SET location=?,price=?,restvolume=?,totalvolume=?,picture=?,uid=? WHERE id=?")
-	if err != nil {
-		return err
-	}
-	_, err = stmt.Exec(gu.Location, gu.Price, gu.RestVolume, gu.TotalVolume, gu.Picture, gu.UID, gu.ID)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (db *Mysql) DeleteGoods(goodsID int64, ctx context.Context) error {
-	stmt, err := db.db.Prepare("DELETE FROM goods WHERE id=?")
-	if err != nil {
-		return err
-	}
-
-	res, err := stmt.Exec(goodsID)
-	if err != nil {
-		return err
-	}
-
-	affect, _ := res.RowsAffected()
-	log.Infof("delete %v from db", affect)
-	return nil
+	id,_:= res.LastInsertId()
+	return id,nil
 }
 

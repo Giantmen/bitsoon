@@ -1,39 +1,37 @@
 package proto
 
 type Goods struct {
-	ID          int64
+	Id          int64
 	Location    string
 	Price       float64
-	RestVolume  int
-	TotalVolume int
+	Restvolume  int
+	Totalvolume int
 	Picture     string
-	UID         string
+	Uid         string
 }
 
 type GoodsInsert struct {
 	//ID          int64
 	Location    string
 	Price       float64
-	RestVolume  int
-	TotalVolume int
+	Restvolume  int
+	Totalvolume int
 	Picture     string
-	UID         string
+	Uid         string
 }
 type GoodsInsertResult struct {
-	ID int64 //添加成功返回一个自增id作为自增id
+	Id int64 //添加成功返回一个自增id作为自增id
 }
 
 type GoodsQueryAll struct {
 }
-type GoodsQueryAllResult struct {
-	Gs []*Goods
-}
+type GoodsQueryAllResult []*Goods
 
 type GoodsQueryOne struct {
-	ID int64 //商品id
+	Id int64 //商品id
 }
 type GoodsQueryOneResult struct {
-	ID          int64
+	Id          int64
 	Location    string
 	Price       float64
 	RestVolume  int
@@ -43,17 +41,17 @@ type GoodsQueryOneResult struct {
 }
 
 type GoodsDelete struct {
-	ID int64
+	Id int64
 }
 
 type GoodsUpdate struct {
-	ID          int64
+	Id          int64
 	Location    string
 	Price       float64
-	RestVolume  int
-	TotalVolume int
+	Restvolume  int
+	Totalvolume int
 	Picture     string
-	UID         string
+	Uid         string
 }
 
 type Response struct {

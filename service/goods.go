@@ -12,6 +12,7 @@ import (
 	"github.com/Giantmen/bitsoon/store"
 
 	"github.com/gorilla/mux"
+	"fmt"
 )
 
 type GoodsManager struct {
@@ -37,7 +38,10 @@ func (gm *GoodsManager) InsertHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := gm.db.InsertGoods(gi, context.Background())
+	sql := fmt.Sprintf("insert into goods(location, price, restvolume, totalvolume, picture,uid)"+
+		" values('%s',%v,%d,%d,'%s','%s')", gi.Location,gi.Price,gi.Restvolume,gi.Totalvolume,gi.Picture,gi.Uid)
+
+	id,err := gm.db.Exec(sql, context.Background())
 	if err != nil {
 		common.HttpResponse(w, 500, err.Error(),nil)
 		return
@@ -55,11 +59,13 @@ func (gm *GoodsManager) DeleteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = gm.db.DeleteGoods(gd.ID, context.Background())
-	if err != nil {
+	sql := fmt.Sprintf("delete from goods where id=%d",gd.Id)
+	_,err = gm.db.Exec(sql,context.Background())
+	if err !=nil {
 		common.HttpResponse(w, 500, err.Error(),nil)
 		return
 	}
+
 	common.HttpResponse(w, 200, "success", nil)
 }
 
@@ -72,8 +78,9 @@ func (gm *GoodsManager) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 		common.HttpResponse(w, 500, err.Error(),nil)
 		return
 	}
-
-	err = gm.db.UpdateGoods(gd, context.Background())
+sql := fmt.Sprintf("update goods set location='%s' price=%v restvolume=%d totalvolume=%d picture='%s' uid='%s' where Id=%d",
+	gd.Location,gd.Price,gd.Restvolume,gd.Totalvolume,gd.Picture,gd.Uid,gd.Id)
+	_,err = gm.db.Exec(sql,context.Background())
 	if err != nil {
 		common.HttpResponse(w, 500, err.Error(),nil)
 		return
@@ -84,18 +91,15 @@ func (gm *GoodsManager) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 func (gm *GoodsManager) QueryAllHandler(w http.ResponseWriter, r *http.Request) {
 	log.Info("query all goods")
-	//gqa := new(proto.GoodsQueryAll)
-	//err = common.ParseQuery(r, gqa)
-	//if err != nil {
-	//	return
-	//}
 
-	allg, err := gm.db.QueryAllGoods(context.Background())
+	sql := fmt.Sprintf("select * from goods")
+	rrs := make([]*proto.Goods, 0)
+	_, err := gm.db.Query(sql,&rrs,context.Background())
 	if err != nil {
 		common.HttpResponse(w, 500,  err.Error(),nil)
 		return
 	}
-	common.HttpResponse(w, 200, "success", allg)
+	common.HttpResponse(w, 200, "success", rrs)
 }
 
 func (gm *GoodsManager) QueryOneHandler(w http.ResponseWriter, r *http.Request) {
@@ -112,16 +116,17 @@ func (gm *GoodsManager) QueryOneHandler(w http.ResponseWriter, r *http.Request) 
 		common.HttpResponse(w, 500, err.Error(),nil)
 		return
 	}
-	//gqo := new(proto.GoodsQueryOne)
-	//err = common.ParseQuery(r, gqo)
-	//if err != nil {
-	//	return
-	//}
 
-	g, err := gm.db.QueryOneGoods(goodsID, context.Background())
+	sql := fmt.Sprintf("select * from goods where id=%d",goodsID)
+	rrs := make([]*proto.Goods, 0)
+	num, err := gm.db.Query(sql,&rrs,context.Background())
 	if err != nil {
-		common.HttpResponse(w, 500, err.Error(),nil)
+		common.HttpResponse(w, 500,  err.Error(),nil)
 		return
 	}
-	common.HttpResponse(w, 200, "success", g)
+	if num <=0 {
+		common.HttpResponse(w, 404,  goodsIDStr+" not found",nil)
+		return
+	}
+	common.HttpResponse(w, 200, "success", rrs[0])
 }
