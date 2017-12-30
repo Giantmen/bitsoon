@@ -11,7 +11,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/linchongky/btcsoon/proto"
+	"github.com/Giantmen/bitsoon/proto"
 	"golang.org/x/net/context/ctxhttp"
 )
 

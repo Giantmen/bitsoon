@@ -11,9 +11,9 @@ import (
 	_ "expvar"
 	_ "net/http/pprof"
 
-	"github.com/linchongky/btcsoon/config"
-	"github.com/linchongky/btcsoon/log"
-	"github.com/linchongky/btcsoon/service"
+	"github.com/Giantmen/bitsoon/config"
+	"github.com/Giantmen/bitsoon/log"
+	"github.com/Giantmen/bitsoon/service"
 )
 
 var (

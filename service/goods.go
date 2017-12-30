@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/linchongky/btcsoon/common"
-	"github.com/linchongky/btcsoon/config"
-	"github.com/linchongky/btcsoon/log"
-	"github.com/linchongky/btcsoon/proto"
-	"github.com/linchongky/btcsoon/store"
+	"github.com/Giantmen/bitsoon/common"
+	"github.com/Giantmen/bitsoon/config"
+	"github.com/Giantmen/bitsoon/log"
+	"github.com/Giantmen/bitsoon/proto"
+	"github.com/Giantmen/bitsoon/store"
 
 	"github.com/gorilla/mux"
 )

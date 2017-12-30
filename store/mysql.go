@@ -3,10 +3,10 @@ package store
 import (
 	"context"
 	"database/sql"
-	"github.com/linchongky/btcsoon/log"
+	"github.com/Giantmen/bitsoon/log"
 
-	"github.com/linchongky/btcsoon/config"
-	"github.com/linchongky/btcsoon/proto"
+	"github.com/Giantmen/bitsoon/config"
+	"github.com/Giantmen/bitsoon/proto"
 
 	_ "github.com/go-sql-driver/mysql"
 )
