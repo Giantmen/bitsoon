@@ -38,8 +38,8 @@ func (um *UserManager) InsertHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sql := fmt.Sprintf("insert into user(id, password, phone, email)"+
-		" values('%s',%s,'%s','%s')", ui.Id,ui.Password,ui.Phone,ui.Email)
+	sql := fmt.Sprintf("insert into user(name, password, phone, email)"+
+		" values('%s','%s','%s','%s')", ui.Name,ui.Password,ui.Phone,ui.Email)
 
 	id,err := um.db.Exec(sql, context.Background())
 	if err != nil {
@@ -78,8 +78,8 @@ func (um *UserManager) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 		common.HttpResponse(w, 500, err.Error(),nil)
 		return
 	}
-	sql := fmt.Sprintf("update user set password='%s' phone=%s email=%s where Id=%s",
-		uu.Password,uu.Phone,uu.Email)
+	sql := fmt.Sprintf("update user set name='%s',password='%s',phone='%s',email='%s' where id=%d",
+		uu.Name,uu.Password,uu.Phone,uu.Email,uu.Id)
 	_,err = um.db.Exec(sql,context.Background())
 	if err != nil {
 		common.HttpResponse(w, 500, err.Error(),nil)

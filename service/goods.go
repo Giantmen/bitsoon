@@ -78,7 +78,7 @@ func (gm *GoodsManager) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 		common.HttpResponse(w, 500, err.Error(),nil)
 		return
 	}
-sql := fmt.Sprintf("update goods set location='%s' price=%v restvolume=%d totalvolume=%d picture='%s' uid='%s' where Id=%d",
+	sql := fmt.Sprintf("update goods set location='%s',price=%v,restvolume=%d,totalvolume=%d,picture='%s',uid='%s' where id=%d",
 	gd.Location,gd.Price,gd.Restvolume,gd.Totalvolume,gd.Picture,gd.Uid,gd.Id)
 	_,err = gm.db.Exec(sql,context.Background())
 	if err != nil {

@@ -16,11 +16,16 @@ type Mysql struct {
 	dbObj  orm.Ormer
 }
 
+func init() {
+	orm.RegisterModel(new(proto.User), new(proto.Goods))//goods 如果没有会自动创建
+}
+
 func NewMysql(cfg *config.Mysql) (*Mysql, error) {
 	conn := cfg.ConnStr
-
-	orm.RegisterModel(new(proto.Goods))//goods 如果没有会自动创建
 	orm.RegisterDriver("mysql", orm.DRMySQL) //注册mysql驱动
+	//orm.RegisterModel(new(proto.Goods))
+	//orm.RegisterModel(new(proto.User), new(proto.Goods))//goods 如果没有会自动创建
+	//orm.RegisterDriver("mysql", orm.DRMySQL) //注册mysql驱动
 	orm.RegisterDataBase("default", "mysql", conn) //设置conn中的数据库为默认使用数据库
 	orm.RunSyncdb("default", false, false)//后一个使用true会带上很多打印信息，数据库操作和建表操作的
 	orm.Debug = true //true 打印数据库操作日志信息

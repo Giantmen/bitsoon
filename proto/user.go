@@ -1,7 +1,8 @@
 package proto
 
 type User struct {
-	Id string
+	Id int64    
+	Name string 
 	Password string
 	Phone string
 	Email string
@@ -17,20 +18,22 @@ type UserQueryAll struct {
 type UserQueryAllResult []*User
 
 type UserQueryOne struct {
-	Id string //商品id
+	Id int64 //用户id
 }
 type UserQueryOneResult struct {
-	Id    string
+	Id    int64
+	Name  string
 	Phone string
 	Email string
 }
 
 type UserDelete struct {
-	Id string
+	Id int64
 }
 
 type UserUpdate struct {
-	Id          string
+	Id          int64
+	Name     string
 	Password string
 	Phone string
 	Email string
