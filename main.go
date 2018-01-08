@@ -61,18 +61,29 @@ func main() {
 	// init log
 	initLog(cfg)
 
-	gs, err := service.NewGoodsManager(cfg)
+	gm, err := service.NewGoodsManager(cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+	um ,err := service.NewUserManager(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	mux := mux.NewRouter()
 
-	mux.HandleFunc("/goods/queryall", gs.QueryAllHandler)
-	mux.HandleFunc("/goods/query/{goodsID}", gs.QueryOneHandler)
-	mux.HandleFunc("/goods/insert", gs.InsertHandler)
-	mux.HandleFunc("/goods/update", gs.UpdateHandler)
-	mux.HandleFunc("/goods/delete", gs.DeleteHandler)
+	mux.HandleFunc("/goods/queryall", gm.QueryAllHandler)
+	mux.HandleFunc("/goods/query/{goodsID}", gm.QueryOneHandler)
+	mux.HandleFunc("/goods/insert", gm.InsertHandler)
+	mux.HandleFunc("/goods/update", gm.UpdateHandler)
+	mux.HandleFunc("/goods/delete", gm.DeleteHandler)
+
+	mux.HandleFunc("/user/queryall", um.QueryAllHandler)
+	mux.HandleFunc("/user/query/{userID}", um.QueryOneHandler)
+	mux.HandleFunc("/user/insert", um.InsertHandler)
+	mux.HandleFunc("/user/update", um.UpdateHandler)
+	mux.HandleFunc("/user/delete", um.DeleteHandler)
+
 	mux.HandleFunc("/loglevel", setloglevel)
 
 	http.Handle("/", mux)
